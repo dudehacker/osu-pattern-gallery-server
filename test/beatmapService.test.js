@@ -3,12 +3,15 @@ const chai = require("chai")
 var assert = chai.assert;
 
 const rankedMap = {
+  mode:"Mania",
   approvalStatus: "Ranked",
 };
 
 const lovedMap = {
+  mode:"Mania",
   approvalStatus: "Loved",
 };
+
 
 describe('get beatmap api', function() {
     it('valid betamap id should return beatmap', function() {
@@ -59,6 +62,11 @@ describe("check valid map for upload", () => {
   });
   it("null approvalStatus should be invalid", () => {
     assert.equal(beatmapService.isValidMap({ approvalStatus: null }), false);
+  });
+  it("taiko map should be invalid", () => {
+    assert.equal(beatmapService.isValidMap({
+      mode: "Taiko"
+    }), false);
   });
   it("ranked map should be true", () => {
     assert.equal(
