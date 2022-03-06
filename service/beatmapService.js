@@ -1,15 +1,17 @@
 const osu = require("node-osu");
 const osuApi = new osu.Api(process.env.OSU_API_KEY);
-const BeatmapStatus = require("../constants/BeatmapStatus")
-
+const BeatmapStatus = require("../constants/BeatmapStatus");
+const Pattern = require("../models/pattern");
+const Beatmap = require("../models/beatmap");
+const logger = require("pino")();
 
 const getMapData = async (beatmapId) => {
     try {
-        beatmap = await osuApi.getBeatmaps({ b: beatmapId });
-        return beatmap
+        map = {...await osuApi.getBeatmaps({ b: beatmapId })}[0]
+        return map
     } catch (err){
-        console.error(`beatmap with id=${beatmapId} is not found!`)
-        console.error(err);
+        logger.error(`beatmap with id=${beatmapId} is not found!`)
+        logger.error(err);
         return null
     }
 };
@@ -21,7 +23,7 @@ const getMapData = async (beatmapId) => {
  */
 const getMapIdFromLink = (mapUrl) => {
     if (typeof mapUrl !== 'string' || !mapUrl instanceof String){
-        console.error(`mapUrl is not string: ${JSON.stringify(mapUrl)}` )
+        logger.error(`mapUrl is not string: ${JSON.stringify(mapUrl)}` )
         return null;
     }
     
@@ -30,7 +32,7 @@ const getMapIdFromLink = (mapUrl) => {
         return parts[1]
     }
 
-    console.error(`mapUrl is invalid: ${mapUrl}, it must be of format: https://osu.ppy.sh/beatmapsets/1578629#mania/3223324` )
+    logger.error(`mapUrl is invalid: ${mapUrl}, it must be of format: https://osu.ppy.sh/beatmapsets/1578629#mania/3223324` )
     return null
 }
 
@@ -39,6 +41,37 @@ const isValidMap = (mapData) =>{
     return [BeatmapStatus.RANKED, BeatmapStatus.LOVED].includes(mapData.approvalStatus)
 }
 
+const  saveMapToDB = async (uploadRequest) => {
+    try {
+        const mapId = getMapIdFromLink(uploadRequest.beatmapUrl)
+        map = await getMapData(mapId);
+    } catch (e) {
+        logger.error(`Error getting map data from Url`);
+        // return res.send({ mapset: {}, errors: ["Invalid beatmap ID"] });
+    }
+
+    if (!isValidMap(map)){
+        logger.error("Map is not valid");
+        logger.error(map)
+
+    }
+
+    const now = new Date();
+
+    const savedMap = await new Beatmap(map).save();
+    const pattern = new Pattern({
+        ...uploadRequest,
+        beatmap: savedMap,
+        p_uploadDate: now
+    });
+    const updated = await pattern.save();
+    logger.info(updated)
+    logger.info(`user has succesfully uploaded pattern for ${pattern.beatmap.artist} - ${pattern.beatmap.title}`);
+    return updated;
+}
+
 const RankedStatus = BeatmapStatus
 
-module.exports = { getMapData, isValidMap, getMapIdFromLink, RankedStatus };
+module.exports = { getMapData, isValidMap, getMapIdFromLink, saveMapToDB, RankedStatus };
+
+

@@ -1,13 +1,30 @@
-const beatmapService = require("./service/beatmapService")
+const logger = require("pino")();
+const api = require("./api");
+const express = require("express");
+const db = require("./db");
 
-var validMap = {}
+const app = express();
 
-beatmapService.getMapData("3161129").then(
-    (map) => {
-        console.log(map[0])
-        validMap = map[0]
-        if (map[0].approvalStatus == beatmapService.RankedStatus.RANKED){
-            console.log("map is ranked!")
-        }
-    }
+app.use(express.json());
+const session = require("express-session");
+
+const MongoStore = require("connect-mongo");
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    store: MongoStore.create({ 
+        clientPromise: db.init(),
+        dbName: process.env.MONGO_DATABASE
+    }),
+    resave: false,
+    saveUninitialized: true,
+  })
 );
+
+app.use("/api", api);
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  logger.info(`Server running on port: ${port}`);
+});
