@@ -4,6 +4,9 @@ const BeatmapStatus = require("../constants/BeatmapStatus");
 const Pattern = require("../models/pattern");
 const Beatmap = require("../models/beatmap");
 const logger = require("pino")();
+const express = require("express");
+const { addAsync } = require("@awaitjs/express");
+const router = addAsync(express.Router());
 
 const getMapData = async (beatmapId) => {
     try {
@@ -37,41 +40,24 @@ const getMapIdFromLink = (mapUrl) => {
 }
 
 const isValidMap = (mapData) =>{
-    if (!mapData || !mapData.approvalStatus) return false;
-    return [BeatmapStatus.RANKED, BeatmapStatus.LOVED].includes(mapData.approvalStatus)
-}
-
-const  saveMapToDB = async (uploadRequest) => {
-    try {
-        const mapId = getMapIdFromLink(uploadRequest.beatmapUrl)
-        map = await getMapData(mapId);
-    } catch (e) {
-        logger.error(`Error getting map data from Url`);
-        // return res.send({ mapset: {}, errors: ["Invalid beatmap ID"] });
+    if (!mapData || !mapData.approvalStatus) {
+        logger.error("something wrong with beatmap data")
+        return false;
     }
-
-    if (!isValidMap(map)){
-        logger.error("Map is not valid");
-        logger.error(map)
-
+    if (mapData.mode != "Mania"){
+        logger.error("map is not mania!")
+        return false;
     }
-
-    const now = new Date();
-
-    const savedMap = await new Beatmap(map).save();
-    const pattern = new Pattern({
-        ...uploadRequest,
-        beatmap: savedMap,
-        p_uploadDate: now
-    });
-    const updated = await pattern.save();
-    logger.info(updated)
-    logger.info(`user has succesfully uploaded pattern for ${pattern.beatmap.artist} - ${pattern.beatmap.title}`);
-    return updated;
+    const validStatus = [BeatmapStatus.RANKED, BeatmapStatus.LOVED].includes(mapData.approvalStatus)
+    if (!validStatus){
+        logger.error("map must be ranked or loved!")
+        return false;
+    }
+    return true;
 }
 
 const RankedStatus = BeatmapStatus
 
-module.exports = { getMapData, isValidMap, getMapIdFromLink, saveMapToDB, RankedStatus };
+module.exports = { getMapData, isValidMap, getMapIdFromLink, RankedStatus };
 
 

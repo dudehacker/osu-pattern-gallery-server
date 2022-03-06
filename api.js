@@ -14,7 +14,29 @@ const beatmapService = require("./service/beatmapService");
  * param {String} beatmapUrl example: https://osu.ppy.sh/beatmapsets/1578629#mania/3223324
  */
 router.postAsync("/pattern", async (req, res) => {
-    const updated = await beatmapService.saveMapToDB(req.body);
+    const uploadRequest = req.body;
+    const mapId = beatmapService.getMapIdFromLink(uploadRequest.beatmapUrl)
+    if (mapId == null){
+        return res.status(400).send("can't parse beatmap Id from beatmap URL");
+    }
+    map = await beatmapService.getMapData(mapId);
+
+    if (!beatmapService.isValidMap(map)){
+        logger.error(map);
+        return res.status(400).send("invalid map for upload");
+    }
+
+    const now = new Date();
+
+    const savedMap = await new Beatmap(map).save();
+    const pattern = new Pattern({
+        ...uploadRequest,
+        beatmap: savedMap,
+        p_uploadDate: now
+    });
+    const updated = await pattern.save();
+    logger.info(updated)
+    logger.info(`user has succesfully uploaded pattern for ${pattern.beatmap.artist} - ${pattern.beatmap.title}`);
     res.send({ pattern: updated });
 });
 
