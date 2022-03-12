@@ -1,12 +1,7 @@
 const osu = require("node-osu");
 const osuApi = new osu.Api(process.env.OSU_API_KEY);
 const BeatmapStatus = require("../constants/BeatmapStatus");
-const Pattern = require("../models/pattern");
-const Beatmap = require("../models/beatmap");
 const logger = require("pino")();
-const express = require("express");
-const { addAsync } = require("@awaitjs/express");
-const router = addAsync(express.Router());
 
 const getMapData = async (beatmapId) => {
     try {

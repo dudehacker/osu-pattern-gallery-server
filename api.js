@@ -3,6 +3,9 @@ const logger = require("pino")();
 const { addAsync } = require("@awaitjs/express");
 const router = addAsync(express.Router());
 const beatmapService = require("./service/beatmapService");
+const imageService = require("./service/imageService");
+const Pattern = require("./models/pattern")
+const Beatmap = require("./models/beatmap")
 
 
 /**
@@ -26,16 +29,24 @@ router.postAsync("/pattern", async (req, res) => {
         return res.status(400).send("invalid map for upload");
     }
 
+
+    imageResponse = await imageService.uploadImageFromOsuUrl(uploadRequest.imageUrl)
+    if (!imageResponse.success){
+        logger.error(`invalid screenshot image: ${uploadRequest.imageUrl}`)
+        return res.status(400).send("invalid screenshot image");
+    }
+
     const now = new Date();
 
     const savedMap = await new Beatmap(map).save();
     const pattern = new Pattern({
         ...uploadRequest,
         beatmap: savedMap,
+        imageUrl: imageResponse.data.link,
+        imageDeleteHash: imageResponse.data.deletehash,
         p_uploadDate: now
     });
     const updated = await pattern.save();
-    logger.info(updated)
     logger.info(`user has succesfully uploaded pattern for ${pattern.beatmap.artist} - ${pattern.beatmap.title}`);
     res.send({ pattern: updated });
 });
