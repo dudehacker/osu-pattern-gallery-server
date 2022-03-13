@@ -18,6 +18,13 @@ const Beatmap = require("./models/beatmap")
  */
 router.postAsync("/pattern", async (req, res) => {
     const uploadRequest = req.body;
+
+    if (!isValidOsuTimestamp(uploadRequest.osuTimestamps)){
+        const errMsg = `invalid osu timestamps: ${uploadRequest.osuTimestamps}`
+        logger.error(errMsg)
+        return res.status(400).send(errMsg);
+    }
+
     const mapId = beatmapService.getMapIdFromLink(uploadRequest.beatmapUrl)
     if (mapId == null){
         return res.status(400).send("can't parse beatmap Id from beatmap URL");

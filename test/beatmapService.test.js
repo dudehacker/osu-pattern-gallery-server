@@ -12,6 +12,21 @@ const lovedMap = {
   approvalStatus: "Loved",
 };
 
+describe('validate osu timestamps', function() {
+  it('valid timestamps should return true', function() {
+    const isValid =  beatmapService.isValidOsuTimestamp("00:37:177 (37177|2,37177|0,37177|1,37270|6) -");
+    assert.isTrue(isValid);
+  });
+  it('valid timestamps 2 should return true', function() {
+    const isValid =  beatmapService.isValidOsuTimestamp("00:37:177 (37177|2) -");
+    assert.isTrue(isValid);
+  });
+  it('invalid timestamps should return false', function() {
+    const isValid =  beatmapService.isValidOsuTimestamp("00:37:177 -");
+    assert.isFalse(isValid);
+  });
+});
+
 
 describe('get beatmap api', function() {
     it('valid betamap id should return beatmap', function() {

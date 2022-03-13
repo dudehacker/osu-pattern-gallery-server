@@ -3,6 +3,16 @@ const osuApi = new osu.Api(process.env.OSU_API_KEY);
 const BeatmapStatus = require("../constants/BeatmapStatus");
 const logger = require("pino")();
 
+const regex = /^\d{2}:\d{2}:\d{3} \(\d+\|\d(,\d+\|\d)*\) -$/
+
+/**
+ * make sure osu timestamp is correct format
+ * @param {String} osuTimestamp 00:37:177 (37177|2,37177|0,37177|1,37270|6) -
+ */
+const isValidOsuTimestamp = (osuTimestamp) => {
+    return regex.test(osuTimestamp)
+}
+
 const getMapData = async (beatmapId) => {
     try {
         map = {...await osuApi.getBeatmaps({ b: beatmapId })}[0]
@@ -53,6 +63,6 @@ const isValidMap = (mapData) =>{
 
 const RankedStatus = BeatmapStatus
 
-module.exports = { getMapData, isValidMap, getMapIdFromLink, RankedStatus };
+module.exports = { getMapData, isValidMap, getMapIdFromLink, isValidOsuTimestamp, RankedStatus };
 
 
