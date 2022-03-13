@@ -18,8 +18,8 @@ const Beatmap = require("./models/beatmap")
  */
 router.postAsync("/pattern", async (req, res) => {
     const uploadRequest = req.body;
-
-    if (!isValidOsuTimestamp(uploadRequest.osuTimestamps)){
+    logger.info(uploadRequest)
+    if (!beatmapService.isValidOsuTimestamp(uploadRequest.osuTimestamps)){
         const errMsg = `invalid osu timestamps: ${uploadRequest.osuTimestamps}`
         logger.error(errMsg)
         return res.status(400).send(errMsg);
@@ -36,12 +36,18 @@ router.postAsync("/pattern", async (req, res) => {
         return res.status(400).send("invalid map for upload");
     }
 
-
-    imageResponse = await imageService.uploadImageFromOsuUrl(uploadRequest.imageUrl)
-    if (!imageResponse.success){
-        logger.error(`invalid screenshot image: ${uploadRequest.imageUrl}`)
-        return res.status(400).send("invalid screenshot image");
+    let errorMsg = `invalid screenshot image: ${uploadRequest.imageUrl}`
+    try {
+        imageResponse = await imageService.uploadImageFromOsuUrl(uploadRequest.imageUrl)
+        if (!imageResponse.success){
+            logger.error(errorMsg)
+            return res.status(400).send(errorMsg);
+        }
+    } catch (err) {
+        logger.error(errorMsg)
+        return res.status(400).send(errorMsg);
     }
+   
 
     const now = new Date();
 
