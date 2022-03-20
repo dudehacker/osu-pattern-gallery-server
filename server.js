@@ -50,7 +50,7 @@ app.use((err, req, res, next) => {
     const status = err.status || 500;
     if (status === 500) {
       logger.error("The server errored when processing a request!");
-      logger.error(err);
+      // logger.error(err);
     }
   
     res.status(status);

@@ -32,10 +32,11 @@ const apiV2 = "https://osu.ppy.sh/api/v2"
 passport.use(
   new OAuth2Strategy(
     {
+      authorizationURL: "https://osu.ppy.sh/oauth/authorize",
       tokenURL: "https://osu.ppy.sh/oauth/token",
       clientID: process.env.OSU_CLIENT_ID,
       clientSecret: process.env.OSU_CLIENT_SECRET,
-      callbackURL: "/auth/osu/callback",
+      callbackURL: `${process.env.FRONT_END}"/auth/osu/callback`,
       scope: ["friends.read","identify","public"]
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -88,12 +89,29 @@ router.post("/logout", (req, res) => {
   res.redirect("/");
 });
 
+router.get("/osu/token", (req,res)=>{
+  body = {}
+  body.client_id = process.env.OSU_CLIENT_ID
+  body.client_secret = process.env.OSU_CLIENT_SECRET
+  body.code = req.query.code
+  body.grant_type = "authorization_code"
+  body.redirect_uri = process.env.FRONT_END+"/auth/osu/callback"
+  logger.info(body)
+  axios.post("https://osu.ppy.sh/oauth/token",body,{headers:{Accept: "application/json", 'Content-Type':"application/json"}}).then(
+    response => {
+      logger.info(Object.keys(response))
+      res.cookie("access_token",response.data.access_token)
+      res.cookie("refresh_token",response.data.refresh_token)
+      return res.send(response.data)
+    }
+  )
+})
+
 router.get(
   "/osu/callback",
   passport.authenticate("oauth2", { failureRedirect: "/login" }),
   function (req, res) {
     // Successful authentication!
-    // janky thing to close the login popup window
     logger.info("Successful authentication!");
     res.cookie("username",req.user.username)
     res.cookie("avatar",req.user.avatarUrl)
