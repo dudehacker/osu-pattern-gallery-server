@@ -7,6 +7,7 @@ const OAuth2Strategy = require("passport-oauth2").Strategy;
 
 const router = express.Router();
 const User = require("./models/user");
+const { loggedIn, notLoggedIn } = require("./ensure");
 
 const reactHost = process.env.FRONT_END || "http://localhost:4000"
 
@@ -82,30 +83,14 @@ passport.deserializeUser(async (id, done) => {
   done(null, user);
 });
 
-router.get("/login", passport.authenticate("oauth2"));
-router.post("/logout", (req, res) => {
+router.get("/login", notLoggedIn, passport.authenticate("oauth2"));
+
+router.get("/logout", loggedIn, (req, res) => {
+  logger.info(`User ${req.user.username} logged out`)
   req.logout();
   req.session.destroy();
-  res.redirect("/");
+  res.redirect(reactHost);
 });
-
-router.get("/osu/token", (req,res)=>{
-  body = {}
-  body.client_id = process.env.OSU_CLIENT_ID
-  body.client_secret = process.env.OSU_CLIENT_SECRET
-  body.code = req.query.code
-  body.grant_type = "authorization_code"
-  body.redirect_uri = process.env.FRONT_END+"/auth/osu/callback"
-  logger.info(body)
-  axios.post("https://osu.ppy.sh/oauth/token",body,{headers:{Accept: "application/json", 'Content-Type':"application/json"}}).then(
-    response => {
-      logger.info(Object.keys(response))
-      res.cookie("access_token",response.data.access_token)
-      res.cookie("refresh_token",response.data.refresh_token)
-      return res.send(response.data)
-    }
-  )
-})
 
 router.get(
   "/osu/callback",

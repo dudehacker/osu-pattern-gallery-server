@@ -9,6 +9,13 @@ function loggedIn(req, res, next) {
   next();
 }
 
+function notLoggedIn(req, res, next){
+    if (req.user && req.user.username) {
+        return res.status(401).send({ error: "Already logged in." });
+    }
+    next();
+}
+
 module.exports = {
-  loggedIn
+  loggedIn, notLoggedIn
 };
