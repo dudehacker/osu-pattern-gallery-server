@@ -49,7 +49,7 @@ passport.use(
           return res.data;
         });
       // fs.writeFileSync("me.json", JSON.stringify(me));
-      let user = await User.findOne({ userid: me.id });
+      let user = await User.findOne({ osuId: me.id });
       if (!user) {
         user = new User({
           osuId: me.id,
