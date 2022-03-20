@@ -8,6 +8,8 @@ const OAuth2Strategy = require("passport-oauth2").Strategy;
 const router = express.Router();
 const User = require("./models/user");
 
+const reactHost = process.env.FRONT_END || "http://localhost:4000"
+
 const updateUser = (user,me) => {
   user.username = me.username
   user.previous_usernames = me.previous_usernames
@@ -96,7 +98,7 @@ router.get(
     logger.info("Successful authentication!");
     res.cookie("username",req.user.username)
     res.cookie("avatar",req.user.avatarUrl)
-    res.redirect(`http://localhost:4000/callback`)
+    res.redirect(`${reactHost}/callback`)
   }
 );
 
