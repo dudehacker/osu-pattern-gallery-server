@@ -36,7 +36,7 @@ passport.use(
       tokenURL: "https://osu.ppy.sh/oauth/token",
       clientID: process.env.OSU_CLIENT_ID,
       clientSecret: process.env.OSU_CLIENT_SECRET,
-      callbackURL: `${process.env.FRONT_END}"/auth/osu/callback`,
+      callbackURL: "http://localhost:3000/auth/osu/callback",
       scope: ["friends.read","identify","public"]
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -82,7 +82,7 @@ passport.deserializeUser(async (id, done) => {
   done(null, user);
 });
 
-router.post("/login", passport.authenticate("oauth2"));
+router.get("/login", passport.authenticate("oauth2"));
 router.post("/logout", (req, res) => {
   req.logout();
   req.session.destroy();
