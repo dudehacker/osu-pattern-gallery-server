@@ -19,6 +19,7 @@
     "@awaitjs/express": "^0.9.0",
     "axios": "^0.26.1",
     "connect-mongo": "^4.6.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.17.3",
     "express-session": "^1.17.2",

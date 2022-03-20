@@ -3,6 +3,7 @@ const api = require("./api");
 const auth = require("./auth");
 const express = require("express");
 const passport = require("passport");
+const cookieParser = require("cookie-parser");
 const db = require("./db");
 const cors = require("cors")
 
@@ -10,10 +11,13 @@ const app = express();
 app.set("trust proxy", true);
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// cookie parser middleware
+app.use(cookieParser());
 const session = require("express-session");
 
 const MongoStore = require("connect-mongo");
-
+const oneDay = 1000 * 60 * 60 * 24;
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -21,6 +25,7 @@ app.use(
         clientPromise: db.init(),
         dbName: process.env.MONGO_DATABASE
     }),
+    cookie: { maxAge: oneDay },
     resave: false,
     saveUninitialized: true,
   })

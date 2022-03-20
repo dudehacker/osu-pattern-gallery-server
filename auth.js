@@ -1,11 +1,31 @@
 const express = require("express");
 const passport = require("passport");
 const logger = require("pino")();
-const axios = require("axios")
+const axios = require("axios");
+const fs = require("fs");
 const OAuth2Strategy = require("passport-oauth2").Strategy;
 
 const router = express.Router();
 const User = require("./models/user");
+
+const updateUser = (user,me) => {
+  user.username = me.username
+  user.previous_usernames = me.previous_usernames
+  user.country = me.country_code
+  user.avatarUrl = me.avatar_url,
+  user.discord = me.discord || ""
+  user.kudosu = me.kudosu.total
+  user.mapping_follower_count = me.mapping_follower_count
+  user.ranked_beatmapset_count = me.ranked_and_approved_beatmapset_count
+  logger.info(`updated user ${ user.username}`)
+}
+
+const updateFriends = (user,friends) => {
+  user.friend_ids = friends.map(user => user.id)
+  logger.info(`updated friends for user ${ user.username}`)
+}
+
+const apiV2 = "https://osu.ppy.sh/api/v2"
 
 passport.use(
   new OAuth2Strategy(
@@ -15,24 +35,36 @@ passport.use(
       clientID: process.env.OSU_CLIENT_ID,
       clientSecret: process.env.OSU_CLIENT_SECRET,
       callbackURL: "/auth/osu/callback",
+      scope: ["friends.read","identify","public"]
     },
     async (accessToken, refreshToken, profile, done) => {
-      const me = await axios.get("https://osu.ppy.sh/api/v2/me", {
+      logger.info(profile)
+      const me = await axios
+        .get(apiV2+"/me", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .then((res) => {
+          return res.data;
+        });
+      // fs.writeFileSync("me.json", JSON.stringify(me));
+      let user = await User.findOne({ userid: me.id });
+      if (!user) {
+        user = new User({
+          osuId: me.id,
+          enabled: true,
+          createdDate: new Date()
+        });
+      } 
+      updateUser(user,me)
+      user.accessToken = accessToken
+      user.refreshToken = refreshToken
+      const friends = await axios.get(apiV2+"/friends", {
         headers: { Authorization: `Bearer ${accessToken}` },
-      }).then((res) => res.json());
-
-      const existing = await User.findOne({ userid: me.id });
-      if (existing) {
-        return done(null, existing);
-      }
-
-      const user = new User({
-        username: me.username,
-        userid: me.id,
-        country: me.country_code,
-        avatar: me.avatar_url,
-        discord: me.discord || "",
+      }).then((res)=>{
+        return res.data;
       });
+      // fs.writeFileSync("friends.json", JSON.stringify(friends));
+      updateFriends(user,friends)
       await user.save();
       done(null, user);
     }
@@ -51,15 +83,17 @@ passport.deserializeUser(async (id, done) => {
 router.get("/login", passport.authenticate("oauth2"));
 router.get("/logout", (req, res) => {
   req.logout();
+  req.session.destroy();
   res.redirect("/");
 });
 
 router.get(
-  "/auth/osu/callback",
+  "/osu/callback",
   passport.authenticate("oauth2", { failureRedirect: "/login" }),
   function (req, res) {
     // Successful authentication!
     // janky thing to close the login popup window
+    logger.info("Successful authentication!");
     res.send("<script>setInterval(window.close)</script>");
   }
 );

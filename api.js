@@ -64,6 +64,12 @@ router.postAsync("/pattern", async (req, res) => {
     res.send({ pattern: updated });
 });
 
+router.get("/user", (req, res) => {
+    logger.info(Object.keys(req))
+    logger.info(req.session)
+    res.send(req.user)
+});
+
 router.all("*", (req, res) => {
     logger.warn(`API route not found: ${req.method} ${req.url}`);
     res.status(404).send({ msg: "API route not found" });
