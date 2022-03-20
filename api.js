@@ -6,7 +6,7 @@ const beatmapService = require("./service/beatmapService");
 const imageService = require("./service/imageService");
 const Pattern = require("./models/pattern")
 const Beatmap = require("./models/beatmap")
-
+const ensure = require("./ensure");
 
 /**
  * POST /api/pattern
@@ -16,7 +16,7 @@ const Beatmap = require("./models/beatmap")
  * param {String} imageUrl screenshot for the pattern
  * param {String} beatmapUrl example: https://osu.ppy.sh/beatmapsets/1578629#mania/3223324
  */
-router.postAsync("/pattern", async (req, res) => {
+router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
     const uploadRequest = req.body;
     logger.info(uploadRequest)
     if (!beatmapService.isValidOsuTimestamp(uploadRequest.osuTimestamps)){

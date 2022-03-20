@@ -32,7 +32,6 @@ const apiV2 = "https://osu.ppy.sh/api/v2"
 passport.use(
   new OAuth2Strategy(
     {
-      authorizationURL: "https://osu.ppy.sh/oauth/authorize",
       tokenURL: "https://osu.ppy.sh/oauth/token",
       clientID: process.env.OSU_CLIENT_ID,
       clientSecret: process.env.OSU_CLIENT_SECRET,
@@ -82,8 +81,8 @@ passport.deserializeUser(async (id, done) => {
   done(null, user);
 });
 
-router.get("/login", passport.authenticate("oauth2"));
-router.get("/logout", (req, res) => {
+router.post("/login", passport.authenticate("oauth2"));
+router.post("/logout", (req, res) => {
   req.logout();
   req.session.destroy();
   res.redirect("/");
