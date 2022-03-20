@@ -94,7 +94,9 @@ router.get(
     // Successful authentication!
     // janky thing to close the login popup window
     logger.info("Successful authentication!");
-    res.send("<script>setInterval(window.close)</script>");
+    res.cookie("username",req.user.username)
+    res.cookie("avatar",req.user.avatarUrl)
+    res.redirect(`http://localhost:4000/callback`)
   }
 );
 
