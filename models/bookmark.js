@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const BookmarkSchema = new mongoose.Schema({
-    osuId: String,
+    osuId: { type: String, index: true },
     likes: [String],
     dislikes: [String]
 });
