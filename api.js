@@ -64,6 +64,15 @@ router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
     res.send({ pattern: updated });
 });
 
+/**
+ * Get all the patterns
+ */
+router.getAsync("/pattern", async (req, res) => {
+    let patterns = await Pattern.find();
+    res.send(patterns)
+});
+
+
 router.get("/user", (req, res) => {
     logger.info(Object.keys(req))
     logger.info(req.session)
