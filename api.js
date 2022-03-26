@@ -8,6 +8,7 @@ const Pattern = require("./models/pattern")
 const Beatmap = require("./models/beatmap")
 const User = require("./models/user")
 const ensure = require("./ensure");
+const Bookmark = require("./models/bookmark");
 
 /**
  * POST /api/pattern
@@ -72,6 +73,8 @@ router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
  */
 router.getAsync("/pattern", async (req, res) => {
     let patterns = await Pattern.find().populate('beatmap p_uploadBy').exec();
+    let osuId = req.user ? req.user.osuId : null;
+    let bookmark = await Bookmark.findOne({osuId: osuId});
     const newData = patterns.map( (x) => {
         if (x._doc.p_uploadBy){
             x._doc.p_uploadBy = {
@@ -79,10 +82,78 @@ router.getAsync("/pattern", async (req, res) => {
                 id:  x._doc.p_uploadBy.osuId
             }
         }
+        if (osuId && bookmark){
+            let liked = bookmark.likes.includes(x._doc._id) 
+            let disliked = bookmark.dislikes.includes(x._doc._id) 
+            x._doc.liked = liked
+            x._doc.disliked = disliked
+        }
         return x
     })
     res.send(newData)
 });
+
+router.postAsync("/pattern/:id/dislike", ensure.loggedIn, async (req, res) => {
+    const patternId = req.params.id
+    let pattern = await Pattern.findOne({_id: patternId})
+    if (!pattern){
+        let errMsg = `pattern ${patternId} to dislike doesn't exist`
+        logger.error(errMsg)
+        res.status(400)
+        return res.send(errMsg);
+    }
+    let bookmark = await Bookmark.findOne({osuId: req.user.osuId})
+    if (!bookmark){
+        bookmark= new Bookmark({
+            osuId: req.user.osuId,
+            likes: [],
+            dislikes: []
+        })
+    }
+    if (!bookmark.dislikes.includes(patternId)){
+        bookmark.dislikes.push(patternId)
+        bookmark.likes = bookmark.likes.filter( x => x != patternId)
+        const saved = await bookmark.save();
+        logger.info(`new pattern ${patternId} added to dislikes for user ${req.user.username}`)
+        return res.send(saved)
+    } 
+    bookmark.dislikes = bookmark.dislikes.filter( x => x != patternId)
+    let msg = `pattern ${patternId} is removed from disliked for user ${req.user.username}`
+    logger.info(msg)
+    const saved = await bookmark.save();
+    return res.send(saved);
+})
+
+router.postAsync("/pattern/:id/like", ensure.loggedIn, async (req, res) => {
+    const patternId = req.params.id
+    let pattern = await Pattern.findOne({_id: patternId})
+    if (!pattern){
+        let errMsg = `pattern ${patternId} to like doesn't exist`
+        logger.error(errMsg)
+        res.status(400)
+        return res.send(errMsg);
+    }
+    let bookmark = await Bookmark.findOne({osuId: req.user.osuId})
+    if (!bookmark){
+        bookmark= new Bookmark({
+            osuId: req.user.osuId,
+            likes: [],
+            dislikes: []
+        })
+    }
+    if (!bookmark.likes.includes(patternId)){
+        bookmark.likes.push(patternId)
+        bookmark.dislikes = bookmark.dislikes.filter( x => x != patternId)
+        const saved = await bookmark.save();
+        logger.info(`new pattern ${patternId} added to likes for user ${req.user.username}`)
+        return res.send(saved)
+    } 
+    bookmark.likes = bookmark.likes.filter( x => x != patternId)
+    let msg = `pattern ${patternId} is removed from liked for user ${req.user.username}`
+    logger.info(msg)
+    const saved = await bookmark.save();
+    return res.send(saved);
+})
 
 
 router.get("/user", (req, res) => {
