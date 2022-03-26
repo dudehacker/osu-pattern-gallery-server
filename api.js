@@ -6,6 +6,7 @@ const beatmapService = require("./service/beatmapService");
 const imageService = require("./service/imageService");
 const Pattern = require("./models/pattern")
 const Beatmap = require("./models/beatmap")
+const User = require("./models/user")
 const ensure = require("./ensure");
 
 /**
@@ -52,12 +53,14 @@ router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
     const now = new Date();
 
     const savedMap = await new Beatmap(map).save();
+    const user = await User.findOne({ osuId: req.user.osuId });
     const pattern = new Pattern({
         ...uploadRequest,
         beatmap: savedMap,
         imageUrl: imageResponse.data.link,
         imageDeleteHash: imageResponse.data.deletehash,
-        p_uploadDate: now
+        p_uploadDate: now,
+        p_uploadBy: user
     });
     const updated = await pattern.save();
     logger.info(`user has succesfully uploaded pattern for ${pattern.beatmap.artist} - ${pattern.beatmap.title}`);
@@ -68,8 +71,14 @@ router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
  * Get all the patterns
  */
 router.getAsync("/pattern", async (req, res) => {
-    let patterns = await Pattern.find();
-    res.send(patterns)
+    let patterns = await Pattern.find().populate('beatmap p_uploadBy').exec();
+    const newData = patterns.map( (x) => {
+        if (x._doc.p_uploadBy){
+            x._doc.p_uploadBy = x._doc.p_uploadBy.username
+        }
+        return x
+    })
+    res.send(newData)
 });
 
 
