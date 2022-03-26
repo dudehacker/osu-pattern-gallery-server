@@ -21,6 +21,10 @@ describe('validate osu timestamps', function() {
     const isValid =  beatmapService.isValidOsuTimestamp("00:37:177 (37177|2) -");
     assert.isTrue(isValid);
   });
+  it('valid timestamps 3 should return true', function() {
+    const isValid =  beatmapService.isValidOsuTimestamp("00:37:177 (37177|2,37177|0,37177|1,37270|6) - ");
+    assert.isTrue(isValid);
+  });
   it('invalid timestamps should return false', function() {
     const isValid =  beatmapService.isValidOsuTimestamp("00:37:177 -");
     assert.isFalse(isValid);

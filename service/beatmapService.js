@@ -10,7 +10,7 @@ const regex = /^\d{2}:\d{2}:\d{3} \(\d+\|\d(,\d+\|\d)*\) -$/
  * @param {String} osuTimestamp 00:37:177 (37177|2,37177|0,37177|1,37270|6) -
  */
 const isValidOsuTimestamp = (osuTimestamp) => {
-    return regex.test(osuTimestamp)
+    return regex.test(osuTimestamp.trim())
 }
 
 const getMapData = async (beatmapId) => {
