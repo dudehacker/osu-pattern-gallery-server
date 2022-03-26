@@ -100,7 +100,7 @@ router.get(
     logger.info("Successful authentication!");
     res.cookie("username",req.user.username)
     res.cookie("avatar",req.user.avatarUrl)
-    res.redirect(`${reactHost}/callback`)
+    res.redirect(`${reactHost}`)
   }
 );
 
