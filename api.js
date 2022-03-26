@@ -74,7 +74,10 @@ router.getAsync("/pattern", async (req, res) => {
     let patterns = await Pattern.find().populate('beatmap p_uploadBy').exec();
     const newData = patterns.map( (x) => {
         if (x._doc.p_uploadBy){
-            x._doc.p_uploadBy = x._doc.p_uploadBy.username
+            x._doc.p_uploadBy = {
+                username: x._doc.p_uploadBy.username,
+                id:  x._doc.p_uploadBy.osuId
+            }
         }
         return x
     })
