@@ -95,6 +95,7 @@ router.getAsync("/pattern", async (req, res) => {
 
 router.postAsync("/pattern/:id/dislike", ensure.loggedIn, async (req, res) => {
     const patternId = req.params.id
+    const osuId = req.user.osuId;
     let pattern = await Pattern.findOne({_id: patternId})
     if (!pattern){
         let errMsg = `pattern ${patternId} to dislike doesn't exist`
@@ -102,6 +103,16 @@ router.postAsync("/pattern/:id/dislike", ensure.loggedIn, async (req, res) => {
         res.status(400)
         return res.send(errMsg);
     }
+    if (!pattern.dislikedBy.includes(osuId)){
+        pattern.dislikedBy.push(osuId)
+        if (pattern.likedBy.includes(osuId)){
+            pattern.likedBy = pattern.likedBy.filter(x => x != osuId)
+        }
+    } else {
+        pattern.dislikedBy = pattern.dislikedBy.filter( x => x != osuId)
+    }
+    await pattern.save();
+    
     let bookmark = await Bookmark.findOne({osuId: req.user.osuId})
     if (!bookmark){
         bookmark= new Bookmark({
@@ -124,8 +135,12 @@ router.postAsync("/pattern/:id/dislike", ensure.loggedIn, async (req, res) => {
     return res.send(saved);
 })
 
+/**
+ * user like or remove like on a pattern 
+ */
 router.postAsync("/pattern/:id/like", ensure.loggedIn, async (req, res) => {
-    const patternId = req.params.id
+    const patternId = req.params.id;
+    const osuId = req.user.osuId;
     let pattern = await Pattern.findOne({_id: patternId})
     if (!pattern){
         let errMsg = `pattern ${patternId} to like doesn't exist`
@@ -133,6 +148,16 @@ router.postAsync("/pattern/:id/like", ensure.loggedIn, async (req, res) => {
         res.status(400)
         return res.send(errMsg);
     }
+    if (!pattern.likedBy.includes(osuId)){
+        pattern.likedBy.push(osuId)
+        if (pattern.dislikedBy.includes(osuId)){
+            pattern.dislikedBy = pattern.dislikedBy.filter(x => x != osuId)
+        }
+    } else {
+        pattern.likedBy = pattern.likedBy.filter( x => x != osuId)
+    }
+    await pattern.save();
+
     let bookmark = await Bookmark.findOne({osuId: req.user.osuId})
     if (!bookmark){
         bookmark= new Bookmark({

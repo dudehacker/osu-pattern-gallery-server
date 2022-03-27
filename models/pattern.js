@@ -8,7 +8,9 @@ const PatternSchema = new mongoose.Schema({
     description: String,
     beatmap: {type: mongoose.Schema.Types.ObjectId, ref: 'Beatmap'},
     p_uploadDate: Date,
-    p_uploadBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+    p_uploadBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    likedBy: [String],
+    dislikedBy: [String]
 });
 
 module.exports = mongoose.model("Pattern", PatternSchema);
