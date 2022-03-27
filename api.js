@@ -69,6 +69,30 @@ router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
 });
 
 /**
+ * get a single pattern
+ */
+router.getAsync("/pattern/:id", async (req, res) => {
+    const patternId = req.params.id
+    let pattern = await Pattern.findOne({_id: patternId}).populate('beatmap p_uploadBy').exec();
+    let osuId = req.user ? req.user.osuId : null;
+
+    if (pattern._doc.p_uploadBy){
+        pattern._doc.p_uploadBy = {
+            username: pattern._doc.p_uploadBy.username,
+            id:  pattern._doc.p_uploadBy.osuId
+        }
+    }
+    if (osuId){
+        let liked = pattern._doc.likedBy.includes(osuId) 
+        let disliked = pattern._doc.dislikedBy.includes(osuId) 
+        pattern._doc.liked = liked
+        pattern._doc.disliked = disliked
+    }
+
+    res.send(pattern)
+});
+
+/**
  * Get all the patterns
  */
 router.getAsync("/pattern", async (req, res) => {
@@ -112,7 +136,7 @@ router.postAsync("/pattern/:id/dislike", ensure.loggedIn, async (req, res) => {
         pattern.dislikedBy = pattern.dislikedBy.filter( x => x != osuId)
     }
     await pattern.save();
-    
+
     let bookmark = await Bookmark.findOne({osuId: req.user.osuId})
     if (!bookmark){
         bookmark= new Bookmark({
