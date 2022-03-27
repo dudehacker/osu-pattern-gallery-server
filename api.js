@@ -96,25 +96,27 @@ router.getAsync("/pattern/:id", async (req, res) => {
  * Get all the patterns
  */
 router.getAsync("/pattern", async (req, res) => {
-    let patterns = await Pattern.find().populate('beatmap p_uploadBy').exec();
-    let osuId = req.user ? req.user.osuId : null;
-    let bookmark = await Bookmark.findOne({osuId: osuId});
-    const newData = patterns.map( (x) => {
-        if (x._doc.p_uploadBy){
-            x._doc.p_uploadBy = {
-                username: x._doc.p_uploadBy.username,
-                id:  x._doc.p_uploadBy.osuId
-            }
-        }
-        if (osuId && bookmark){
-            let liked = bookmark.likes.includes(x._doc._id) 
-            let disliked = bookmark.dislikes.includes(x._doc._id) 
-            x._doc.liked = liked
-            x._doc.disliked = disliked
-        }
-        return x
-    })
-    res.send(newData)
+    let patterns = await Pattern.find({},'imageUrl _id')
+    res.send(patterns)
+    // let patterns = await Pattern.find().populate('beatmap p_uploadBy').exec();
+    // let osuId = req.user ? req.user.osuId : null;
+    // let bookmark = await Bookmark.findOne({osuId: osuId});
+    // const newData = patterns.map( (x) => {
+    //     if (x._doc.p_uploadBy){
+    //         x._doc.p_uploadBy = {
+    //             username: x._doc.p_uploadBy.username,
+    //             id:  x._doc.p_uploadBy.osuId
+    //         }
+    //     }
+    //     if (osuId && bookmark){
+    //         let liked = bookmark.likes.includes(x._doc._id) 
+    //         let disliked = bookmark.dislikes.includes(x._doc._id) 
+    //         x._doc.liked = liked
+    //         x._doc.disliked = disliked
+    //     }
+    //     return x
+    // })
+    // res.send(newData)
 });
 
 router.postAsync("/pattern/:id/dislike", ensure.loggedIn, async (req, res) => {
