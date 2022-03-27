@@ -9,6 +9,7 @@ const Beatmap = require("./models/beatmap")
 const User = require("./models/user")
 const ensure = require("./ensure");
 const Bookmark = require("./models/bookmark");
+const {upperCaseFirstWord} = require("./service/util")
 
 /**
  * POST /api/pattern
@@ -92,31 +93,56 @@ router.getAsync("/pattern/:id", async (req, res) => {
     res.send(pattern)
 });
 
+// todo add raw_approvedDate filter
+const beatmapQueryFields = ["genre","language","keys","rating","minBpm", "maxBpm"];
+
 /**
  * Get all the patterns
  */
 router.getAsync("/pattern", async (req, res) => {
-    let patterns = await Pattern.find({},'imageUrl _id')
+    console.log(req.query);
+    const {page, limit} = req.query;
+    var beatmapQuery = {}
+    beatmapQueryFields.forEach(function (field, index) {
+        if (req.query[field]){
+            switch(field){
+                case "language":
+                case "genre":
+                    beatmapQuery[field] = upperCaseFirstWord(req.query[field])
+                    break;
+                case "keys":
+                    let keys = Number(req.query[field]);
+                    if (keys) beatmapQuery["difficulty.size"] =  keys
+                    break;
+                case "rating":
+                    let rating = Number(req.query[field]);
+                    if (rating) beatmapQuery[field] = {"$gte": rating}
+                    break;
+                case "minBpm":
+                    let minBpm = Number(req.query[field]);
+                    beatmapQuery.bpm = Object.assign({},beatmapQuery.bpm,{"$gte": minBpm})
+                    break;
+                case "maxBpm":
+                    let maxBpm = Number(req.query[field]);
+                    beatmapQuery.bpm = Object.assign({},beatmapQuery.bpm,{"$lte": maxBpm})
+                    break;
+
+                default:
+                    beatmapQuery[field] =  {$regex : req.query[field]}
+            }
+            
+        }
+    })
+    // console.log(beatmapQuery)
+    const beatmapIds = await Beatmap.find(beatmapQuery, "_id");
+    var patternQuery = {}
+    if (Object.keys(beatmapQuery).length > 0){
+        patternQuery.beatmap = {
+            "$in": beatmapIds
+        }
+    }
+    const patterns = await Pattern.find(patternQuery,'imageUrl _id', { skip: page*limit, limit: limit })
     res.send(patterns)
-    // let patterns = await Pattern.find().populate('beatmap p_uploadBy').exec();
-    // let osuId = req.user ? req.user.osuId : null;
-    // let bookmark = await Bookmark.findOne({osuId: osuId});
-    // const newData = patterns.map( (x) => {
-    //     if (x._doc.p_uploadBy){
-    //         x._doc.p_uploadBy = {
-    //             username: x._doc.p_uploadBy.username,
-    //             id:  x._doc.p_uploadBy.osuId
-    //         }
-    //     }
-    //     if (osuId && bookmark){
-    //         let liked = bookmark.likes.includes(x._doc._id) 
-    //         let disliked = bookmark.dislikes.includes(x._doc._id) 
-    //         x._doc.liked = liked
-    //         x._doc.disliked = disliked
-    //     }
-    //     return x
-    // })
-    // res.send(newData)
 });
 
 router.postAsync("/pattern/:id/dislike", ensure.loggedIn, async (req, res) => {
