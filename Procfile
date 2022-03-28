@@ -1,1 +1,1 @@
-web: node server.js | pino-pretty -t SYS:standard
+web: node server.js
