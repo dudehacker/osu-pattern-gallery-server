@@ -37,7 +37,7 @@ passport.use(
       tokenURL: "https://osu.ppy.sh/oauth/token",
       clientID: process.env.OSU_CLIENT_ID,
       clientSecret: process.env.OSU_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/osu/callback",
+      callbackURL: process.env.API_HOST+"/auth/osu/callback",
       scope: ["friends.read","identify","public"]
     },
     async (accessToken, refreshToken, profile, done) => {
