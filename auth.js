@@ -92,14 +92,17 @@ router.get("/logout", loggedIn, (req, res) => {
   res.redirect(reactHost);
 });
 
+const cookieOpts = { sameSite: "none", secure: true}
+
 router.get(
   "/osu/callback",
   passport.authenticate("oauth2", { failureRedirect: "/login" }),
   function (req, res) {
     // Successful authentication!
     logger.info("Successful authentication!");
-    res.cookie("username",req.user.username)
-    res.cookie("avatar",req.user.avatarUrl)
+    
+    res.cookie("username",req.user.username, cookieOpts)
+    res.cookie("avatar",req.user.avatarUrl, cookieOpts)
     res.redirect(`${reactHost}`)
   }
 );
