@@ -23,7 +23,7 @@ const App = () => {
       <AppBar />
       <Home />
       <Dialog onClose={handleClickOpen} open={globalAlert.show}>
-        <Alert severity="error">{globalAlert.message}</Alert>
+        <Alert severity={globalAlert.type}>{globalAlert.message}</Alert>
       </Dialog>
       <Dialog onClose={() => {}} open={globalLoading}>
         <CircularProgress />

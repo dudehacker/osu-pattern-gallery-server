@@ -9,7 +9,7 @@ export const useStore = create((set) => ({
   },
   isLoggedIn: !!Cookies.get("username"),
   globalAlert: {
-    type: "",
+    type: "info",
     message: "",
     show: false,
   },
