@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.likedButton {
+  color: rgb(128, 204, 51);
+}
+
+.dislikedButton {
+    color: rgb(204, 51, 51);
+}
+
+.normalButton {
+  color: rgb(92, 105, 112);
+}
