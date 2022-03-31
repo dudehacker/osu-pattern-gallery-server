@@ -12,6 +12,11 @@ app.set("trust proxy", true);
 app.use(cors({origin:true, credentials: true}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+if (process.env.NODE_ENV == 'production'){
+  app.use(express.static('client/build'));
+}
+
 // cookie parser middleware
 app.use(cookieParser());
 const session = require("express-session");
