@@ -9,6 +9,7 @@ import {
   DialogActions,
   Button,
   Fab,
+  Typography
   //   Modal,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -63,6 +64,8 @@ const Upload = () => {
       <Dialog onClose={handleOpen} open={open}>
         <DialogTitle>Submit New Pattern</DialogTitle>
         <form autoComplete="off" onSubmit={handleFormSubmit}>
+        <Typography variant="body2">Tip: Use Shift+F12 to take a screenshot of pattern in osu editor!</Typography>
+        <Typography variant="body2">Tip: Don't copy the wrong difficulty link for beatmap link</Typography>
           {patternUploadFields.map((inputFieldValue, index) => {
             return (
               <TextField
