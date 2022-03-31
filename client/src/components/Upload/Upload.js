@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import React, { useState } from "react";
 import { useFormControls } from "./formControls";
 import { useStore } from "../../store";
@@ -32,6 +33,7 @@ const Upload = () => {
     } else {
       setGlobalAlert("success", "You have succcessfuly uploaded the pattern!");
       setOpen(false);
+      location.reload();
     }
   };
 
