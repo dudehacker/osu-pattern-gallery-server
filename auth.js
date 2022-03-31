@@ -101,9 +101,8 @@ router.get(
     // Successful authentication!
     logger.info("Successful authentication!");
     
-    // res.cookie("username",req.user.username, cookieOpts)
-    // res.cookie("avatar",req.user.avatarUrl, cookieOpts)
-    res.redirect(`${reactHost}/callback?username=${req.user.username}&avatar=${req.user.avatarUrl}`)
+    res.cookie("username",req.user.username, cookieOpts)
+    res.cookie("avatar",req.user.avatarUrl, cookieOpts)
   }
 );
 
