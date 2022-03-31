@@ -103,6 +103,7 @@ router.get(
     
     res.cookie("username",req.user.username, cookieOpts)
     res.cookie("avatar",req.user.avatarUrl, cookieOpts)
+    res.send("Login success!");
   }
 );
 
