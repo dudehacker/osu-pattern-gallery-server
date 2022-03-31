@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha -r dotenv/config",
-    "start": "node -r dotenv/config server.js | pino-pretty -t SYS:standard"
+    "startDev": "node -r dotenv/config server.js | pino-pretty -t SYS:standard",
+    "start":"node server.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "author": "",
   "license": "ISC",
