@@ -17,9 +17,9 @@ axios.interceptors.response.use(
 
 
 const routes = {
-  pattern: `/api/pattern`,
-  login: `/auth/login`,
-  logout: `/auth/logout`,
+  pattern: `${process.env.REACT_APP_API_HOST}/api/pattern`,
+  login: `${process.env.REACT_APP_API_HOST}/auth/login`,
+  logout: `${process.env.REACT_APP_API_HOST}/auth/logout`,
 };
 
 // Don't export axios lol
