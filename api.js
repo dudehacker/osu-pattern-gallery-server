@@ -124,7 +124,7 @@ router.getAsync("/pattern", async (req, res) => {
                 case "rating":
                 case "bpm":
                     if (Array.isArray(value) && value.length == 2)
-                        beatmapQuery[field] = { "$gt" : value[0], "$lt" : value[1]}
+                        beatmapQuery[field] = { "$gte" : value[0], "$lte" : value[1]}
                     break;
 
                 // default:
