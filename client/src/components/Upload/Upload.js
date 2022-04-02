@@ -9,7 +9,7 @@ import {
   DialogActions,
   Button,
   Fab,
-  Typography
+  Typography,
   //   Modal,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -63,36 +63,49 @@ const Upload = () => {
       </Fab>
       <Dialog onClose={handleOpen} open={open}>
         <DialogTitle>Submit New Pattern</DialogTitle>
-        <form autoComplete="off" onSubmit={handleFormSubmit}>
-        <Typography variant="body2">Tip: Use Shift+F12 to take a screenshot of pattern in osu editor!</Typography>
-        <Typography variant="body2">Tip: Don't copy the wrong difficulty link for beatmap link</Typography>
-          {patternUploadFields.map((inputFieldValue, index) => {
-            return (
-              <TextField
-                key={index}
-                onChange={handleInputValue}
-                onBlur={handleInputValue}
-                name={inputFieldValue.name}
-                label={inputFieldValue.label}
-                helperText={errors[inputFieldValue.name]}
-                multiline={inputFieldValue.multiline ?? false}
-                fullWidth
-                autoComplete="none"
-                {...(errors[inputFieldValue.name] && {
-                  error: true,
-                  helperText: errors[inputFieldValue.name],
-                })}
-              />
-            );
-          })}
+        <div className="container">
+          <form autoComplete="off" onSubmit={handleFormSubmit}>
+            <Typography variant="body2">
+              Tip: Use Shift+F12 to take a screenshot of pattern in osu editor!
+            </Typography>
+            <Typography variant="body2">
+              Tip: Don't copy the wrong difficulty link for beatmap link
+            </Typography>
+            <Typography variant="body2">
+              Tip: You can only upload pattern from ranked or loved maps
+            </Typography>
+            {patternUploadFields.map((inputFieldValue, index) => {
+              return (
+                <TextField
+                  key={index}
+                  onChange={handleInputValue}
+                  onBlur={handleInputValue}
+                  name={inputFieldValue.name}
+                  label={inputFieldValue.label}
+                  helperText={errors[inputFieldValue.name]}
+                  multiline={inputFieldValue.multiline ?? false}
+                  fullWidth
+                  autoComplete="none"
+                  {...(errors[inputFieldValue.name] && {
+                    error: true,
+                    helperText: errors[inputFieldValue.name],
+                  })}
+                />
+              );
+            })}
 
-          <DialogActions disableSpacing className="flex justify-between">
-            <Button variant="contained" type="submit" disabled={!formIsValid()}>
-              Submit
-            </Button>
-            <Button onClick={handleClose}>Cancel</Button>
-          </DialogActions>
-        </form>
+            <DialogActions disableSpacing className="flex justify-between">
+              <Button
+                variant="contained"
+                type="submit"
+                disabled={!formIsValid()}
+              >
+                Submit
+              </Button>
+              <Button onClick={handleClose}>Cancel</Button>
+            </DialogActions>
+          </form>
+        </div>
       </Dialog>
     </div>
   );
