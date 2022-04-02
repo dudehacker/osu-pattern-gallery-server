@@ -106,13 +106,14 @@ const beatmapQueryFields = ["genre","language","keys","rating","bpm"];
 /**
  * Get all the patterns
  */
-router.getAsync("/pattern", async (req, res) => {
+router.postAsync("/pattern/search", async (req, res) => {
     console.log(req.body)
+    console.log(req.query)
     const {page, limit} = req.query;
     var beatmapQuery = {}
     beatmapQueryFields.forEach(function (field, index) {
         let value = req.body[field]
-        if (value){
+        if (Array.isArray(value) && value.length > 0){
             switch(field){
                 case "language":
                 case "genre": 
@@ -123,7 +124,7 @@ router.getAsync("/pattern", async (req, res) => {
                     break;
                 case "rating":
                 case "bpm":
-                    if (Array.isArray(value) && value.length == 2)
+                    if ( value.length == 2)
                         beatmapQuery[field] = { "$gte" : value[0], "$lte" : value[1]}
                     break;
 
@@ -133,7 +134,7 @@ router.getAsync("/pattern", async (req, res) => {
             
         }
     })
-    console.log(beatmapQuery)
+    // console.log(beatmapQuery)
     const beatmapIds = await Beatmap.find(beatmapQuery, "_id");
     var patternQuery = {}
     if (Object.keys(beatmapQuery).length > 0){

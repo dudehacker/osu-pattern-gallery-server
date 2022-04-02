@@ -2,6 +2,19 @@ import create from "zustand";
 import Cookies from "js-cookie";
 import { getPatterns } from "./service/patternService";
 
+const initialPatternSearch = {
+  text:"",
+  filters: {
+    language:[],
+    genre:[],
+    keys:[],
+    rating:[0, 10],
+    bpm: [0, 500]
+  },
+  page: 0,
+  limit: 25
+};
+
 export const useStore = create((set) => ({
   user: {
     username: Cookies.get("username") || "",
@@ -14,6 +27,12 @@ export const useStore = create((set) => ({
     show: false,
   },
   globalLoading: false,
+  patternFilters: {
+    genre: ["Video Game","Anime","Rock","Pop","Novelty","Hip Hop","Electronic","Metal","Unspecified","Other"],
+    language: ["English","Chinese","Japanese","Korean","Instrumental","Unspecified","Other"]
+    // language: ["English","Chinese","French","German","Italian","Japanese","Korean","Spanish","Swedish","Russian","Polish","Instrumental","Unspecified","Other"]
+  },
+  patternSearch: initialPatternSearch,
   patterns: [],
   patternUploadFields: [
     {
@@ -40,7 +59,7 @@ export const useStore = create((set) => ({
     },
   ],
   fetchInitialPatterns: async () => {
-    const patterns = await getPatterns();
+    const patterns = await getPatterns(initialPatternSearch);
     set(() => ({ patterns }));
   },
   setGlobalAlert: (type, message) => {
@@ -50,6 +69,16 @@ export const useStore = create((set) => ({
         message,
         show: true,
       },
+    }));
+  },
+  setPatterns: (patterns) => {
+    set(() => ({
+      patterns: patterns,
+    }));
+  },
+  setPatternSearch: (newVal) => {
+    set(() => ({
+      patternSearch: newVal,
     }));
   },
   clearGlobalAlert: () => {

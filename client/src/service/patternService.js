@@ -15,10 +15,14 @@ const getPattern = (id) => {
 };
 
 // Get all patterns
-const getPatterns = () => {
+const getPatterns = (query) => {
+  console.log(query)
   return new Promise((resolve, reject) => {
     axios
-      .get(routes.pattern)
+      .post(routes.pattern+"/search", query.filters, {params: {
+        page: query.page,
+        limit: query.limit
+      }})
       .then((res) => resolve(res.data))
       .catch((error) => {
         console.error(error);
