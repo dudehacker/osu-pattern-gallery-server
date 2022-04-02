@@ -113,7 +113,7 @@ router.postAsync("/pattern/search", async (req, res) => {
     var beatmapQuery = {}
     beatmapQueryFields.forEach(function (field, index) {
         let value = req.body[field]
-        if (Array.isArray(value) && value.length > 0 || Number.isInteger(value)){
+        if (Array.isArray(value) && value.length > 0 || typeof value == 'number'){
             switch(field){
                 case "language":
                 case "genre": 
@@ -123,6 +123,8 @@ router.postAsync("/pattern/search", async (req, res) => {
                     beatmapQuery["difficulty.size"] = value
                     break;
                 case "rating":
+                    beatmapQuery[field] = {"$gte":value}
+                    break;
                 case "bpm":
                     if ( value.length == 2)
                         beatmapQuery[field] = { "$gte" : value[0], "$lte" : value[1]}
@@ -134,7 +136,7 @@ router.postAsync("/pattern/search", async (req, res) => {
             
         }
     })
-    // console.log(beatmapQuery)
+    console.log(beatmapQuery)
     const beatmapIds = await Beatmap.find(beatmapQuery, "_id");
     var patternQuery = {}
     if (Object.keys(beatmapQuery).length > 0){

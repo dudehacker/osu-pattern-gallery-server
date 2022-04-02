@@ -8,7 +8,7 @@ const initialPatternSearch = {
     language:[],
     genre:[],
     keys:4,
-    rating:[0, 10],
+    rating:0,
     bpm: [0, 500]
   },
   page: 0,

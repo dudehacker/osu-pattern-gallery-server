@@ -2,6 +2,7 @@ import React from "react";
 import { useStore } from "../../store";
 import PianoIcon from "@mui/icons-material/Piano";
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import MoodIcon from '@mui/icons-material/Mood';
 
 import {
   Checkbox,
@@ -56,8 +57,8 @@ const PatternFilter = (props) => {
   return (
     <FormGroup>
 
-      <Box sx={{ width: 250 }}>
-        <Grid container spacing={2} alignItems="center">
+      <Box sx={{ width: 500}}>
+        <Grid container spacing={2} alignItems="left">
           <Grid item xs>
             <TextField
               id="outlined-number"
@@ -126,6 +127,30 @@ const PatternFilter = (props) => {
               }}
               variant="standard"
               onChange={handleBpmChange}
+              onKeyPress={props.onKeyPress}
+            />
+          </Grid>
+
+          <Grid item xs>
+            <TextField
+              id="outlined-number"
+              label="User Rating"
+              type="number"
+              name="rating"
+              defaultValue={patternSearch.filters.rating}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MoodIcon />
+                  </InputAdornment>
+                ),
+                inputProps: { min:0, max: 500 }
+              }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="standard"
+              onChange={handleKeysChange}
               onKeyPress={props.onKeyPress}
             />
           </Grid>
