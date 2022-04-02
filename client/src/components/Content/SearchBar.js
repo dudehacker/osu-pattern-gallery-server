@@ -1,35 +1,46 @@
 import React from "react";
 import { PatternFilter } from "./PatternFilter";
-import SearchField from "react-search-field";
 import { useStore } from "../../store";
-import { Grid } from "@mui/material";
-import {getPatterns} from "../../service/patternService"
+import { Grid, InputAdornment, IconButton, TextField } from "@mui/material";
+import { getPatterns } from "../../service/patternService";
+import SearchIcon from "@mui/icons-material/Search";
 
 const CustomSearch = () => {
   const { setPatterns } = useStore.getState();
   const patternSearch = useStore((state) => state.patternSearch);
 
-  const handleFormSubmit = (searchText) => {
-    console.log(searchText);
+  const handleFormSubmit = (event) => {
     // didn't add text search yet in Backend
     console.log(patternSearch);
-    getPatterns(patternSearch).then((newPatterns)=>{
+    getPatterns(patternSearch).then((newPatterns) => {
       setPatterns(newPatterns);
     });
   };
 
-  const handleChange = (searchText, event) => {
-    console.log(searchText);
+  const handleOnKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      // Do code here
+      event.preventDefault();
+      handleFormSubmit(event);
+    }
   }
 
   return (
     <Grid container spacing={1}>
       <Grid item xs={12}>
-        <SearchField
-          placeholder="Search item"
-          onChange={handleChange}
-          onEnter={handleFormSubmit}
-          onSearchClick={handleFormSubmit}
+        <TextField
+          onKeyPress={handleOnKeyPress}
+          fullWidth
+          label="Search"
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="start">
+                <IconButton onClick={handleFormSubmit}>
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
       </Grid>
       <Grid item xs={12}>
