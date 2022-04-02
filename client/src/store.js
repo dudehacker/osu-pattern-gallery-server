@@ -7,7 +7,7 @@ const initialPatternSearch = {
   filters: {
     language:[],
     genre:[],
-    keys:[],
+    keys:4,
     rating:[0, 10],
     bpm: [0, 500]
   },

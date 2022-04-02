@@ -44,7 +44,7 @@ const CustomSearch = () => {
         />
       </Grid>
       <Grid item xs={12}>
-        <PatternFilter />
+        <PatternFilter onKeyPress={handleOnKeyPress}/>
       </Grid>
     </Grid>
   );
