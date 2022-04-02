@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const BeatmapSchema = new mongoose.Schema({
-    id: String,
-    beatmapSetId: String,
-    hash: String,
+    id: { type: [String], index: true },
+    beatmapSetId: { type: [String], index: true },
+    hash: { type: [String], index: true },
     title: String,
     creator: String,
     version: String,
