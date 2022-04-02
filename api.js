@@ -101,7 +101,7 @@ router.getAsync("/pattern/:id", async (req, res) => {
 });
 
 // todo add raw_approvedDate filter
-const beatmapQueryFields = ["genre","language","keys","rating","bpm"];
+const beatmapQueryFields = ["genre","language","keys","rating","bpm","sr"];
 
 /**
  * Get all the patterns
@@ -128,6 +128,10 @@ router.postAsync("/pattern/search", async (req, res) => {
                 case "bpm":
                     if ( value.length == 2)
                         beatmapQuery[field] = { "$gte" : value[0], "$lte" : value[1]}
+                    break;
+                case "sr":
+                    if ( value.length == 2)
+                        beatmapQuery["difficulty.rating"] = { "$gte" : value[0], "$lte" : value[1]}
                     break;
 
                 // default:

@@ -9,7 +9,8 @@ const initialPatternSearch = {
     genre:[],
     keys:4,
     rating:0,
-    bpm: [0, 500]
+    bpm: [0, 500],
+    sr: [0, 15]
   },
   page: 0,
   limit: 25

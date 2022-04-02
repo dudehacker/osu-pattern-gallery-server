@@ -3,6 +3,7 @@ import { useStore } from "../../store";
 import PianoIcon from "@mui/icons-material/Piano";
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import MoodIcon from '@mui/icons-material/Mood';
+import StarIcon from '@mui/icons-material/Star';
 
 import {
   Checkbox,
@@ -54,10 +55,21 @@ const PatternFilter = (props) => {
     setPatternSearch(patternSearch);
   }
 
+  const handleSRChange = (event) => {
+    let key = event.target.name;
+    let value = Number(event.target.value);
+    if (key==="minSR"){
+      patternSearch.filters.sr[0] = value;
+    } else {
+      patternSearch.filters.sr[1] = value;
+    }
+    setPatternSearch(patternSearch);
+  }
+
   return (
     <FormGroup>
 
-      <Box sx={{ width: 500}}>
+      <Box sx={{ width: 700}}>
         <Grid container spacing={2} alignItems="left">
           <Grid item xs>
             <TextField
@@ -83,7 +95,7 @@ const PatternFilter = (props) => {
             />
           </Grid>
 
-          <Grid item xs>
+          <Grid item md>
             <TextField
               id="outlined-number"
               label="Min BPM"
@@ -107,7 +119,7 @@ const PatternFilter = (props) => {
             />
           </Grid>
 
-          <Grid item xs>
+          <Grid item md>
             <TextField
               id="outlined-number"
               label="Max BPM"
@@ -127,6 +139,54 @@ const PatternFilter = (props) => {
               }}
               variant="standard"
               onChange={handleBpmChange}
+              onKeyPress={props.onKeyPress}
+            />
+          </Grid>
+
+          <Grid item md>
+            <TextField
+              id="outlined-number"
+              label="Min Star Rating"
+              type="number"
+              name="minSR"
+              defaultValue={patternSearch.filters.sr[0]}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StarIcon />
+                  </InputAdornment>
+                ),
+                inputProps: { min:0, max: 15 }
+              }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="standard"
+              onChange={handleSRChange}
+              onKeyPress={props.onKeyPress}
+            />
+          </Grid>
+
+          <Grid item md>
+            <TextField
+              id="outlined-number"
+              label="Max Star Rating"
+              type="number"
+              name="maxSR"
+              defaultValue={patternSearch.filters.sr[1]}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StarIcon />
+                  </InputAdornment>
+                ),
+                inputProps: { min:0, max: 15 }
+              }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="standard"
+              onChange={handleSRChange}
               onKeyPress={props.onKeyPress}
             />
           </Grid>
