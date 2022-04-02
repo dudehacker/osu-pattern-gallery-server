@@ -32,12 +32,6 @@ router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
     if (mapId == null){
         return res.status(400).send("can't parse beatmap Id from beatmap URL");
     }
-    map = await beatmapService.getMapData(mapId);
-
-    if (!beatmapService.isValidMap(map)){
-        logger.error(map);
-        return res.status(400).send("invalid map for upload");
-    }
 
     let errorMsg = `invalid screenshot image: ${uploadRequest.imageUrl}`
     try {
@@ -50,11 +44,24 @@ router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
         logger.error(errorMsg)
         return res.status(400).send(errorMsg);
     }
-   
+    
+    let savedMap = await Beatmap.findOne({id: mapId});
+
+    if (!savedMap){
+        logger.info(`looking up new map: ${mapId}`)
+        let newMap = await beatmapService.getMapData(mapId);
+
+        if (!beatmapService.isValidMap(newMap)){
+            logger.error(newMap);
+            return res.status(400).send(`invalid map for upload: ${mapId}`);
+        }
+        savedMap = await new Beatmap(newMap).save();
+    } else {
+        logger.info(`found map ${mapId}`)
+    }
 
     const now = new Date();
 
-    const savedMap = await new Beatmap(map).save();
     const user = await User.findOne({ osuId: req.user.osuId });
     const pattern = new Pattern({
         ...uploadRequest,
@@ -94,46 +101,39 @@ router.getAsync("/pattern/:id", async (req, res) => {
 });
 
 // todo add raw_approvedDate filter
-const beatmapQueryFields = ["genre","language","keys","rating","minBpm", "maxBpm"];
+const beatmapQueryFields = ["genre","language","keys","rating","bpm"];
 
 /**
  * Get all the patterns
  */
 router.getAsync("/pattern", async (req, res) => {
-    console.log(req.query);
+    console.log(req.body)
     const {page, limit} = req.query;
     var beatmapQuery = {}
     beatmapQueryFields.forEach(function (field, index) {
-        if (req.query[field]){
+        let value = req.body[field]
+        if (value){
             switch(field){
                 case "language":
-                case "genre":
-                    beatmapQuery[field] = upperCaseFirstWord(req.query[field])
+                case "genre": 
+                    beatmapQuery[field] =  {"$in": value}
                     break;
                 case "keys":
-                    let keys = Number(req.query[field]);
-                    if (keys) beatmapQuery["difficulty.size"] =  keys
+                    beatmapQuery["difficulty.size"] =  {"$in": value}
                     break;
                 case "rating":
-                    let rating = Number(req.query[field]);
-                    if (rating) beatmapQuery[field] = {"$gte": rating}
-                    break;
-                case "minBpm":
-                    let minBpm = Number(req.query[field]);
-                    beatmapQuery.bpm = Object.assign({},beatmapQuery.bpm,{"$gte": minBpm})
-                    break;
-                case "maxBpm":
-                    let maxBpm = Number(req.query[field]);
-                    beatmapQuery.bpm = Object.assign({},beatmapQuery.bpm,{"$lte": maxBpm})
+                case "bpm":
+                    if (Array.isArray(value) && value.length == 2)
+                        beatmapQuery[field] = { "$gt" : value[0], "$lt" : value[1]}
                     break;
 
-                default:
-                    beatmapQuery[field] =  {$regex : req.query[field]}
+                // default:
+                //     beatmapQuery[field] =  {$regex : req.query[field]}
             }
             
         }
     })
-    // console.log(beatmapQuery)
+    console.log(beatmapQuery)
     const beatmapIds = await Beatmap.find(beatmapQuery, "_id");
     var patternQuery = {}
     if (Object.keys(beatmapQuery).length > 0){
