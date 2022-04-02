@@ -8,11 +8,20 @@ const Gallery = () => {
 
   return (
     <Card className="bg-black f-full w-full flex-1 flex pt-4">
-      <Grid container spacing={2}>
-        <Grid item xs={2}>
-          {patterns.map((pattern) => (
-            <Pattern key={pattern._id} data={pattern} />
-          ))}
+      <Grid direction="row" container spacing={1}>
+        <Grid container item sm={6}>
+          <Grid item>
+            {patterns.map((pattern, i) =>
+              i % 2 === 0 ? <Pattern key={pattern._id} data={pattern} /> : null
+            )}
+          </Grid>
+        </Grid>
+        <Grid container item sm={6}>
+          <Grid item>
+            {patterns.map((pattern, i) =>
+              i % 2 === 1 ? <Pattern key={pattern._id} data={pattern} /> : null
+            )}
+          </Grid>
         </Grid>
       </Grid>
     </Card>

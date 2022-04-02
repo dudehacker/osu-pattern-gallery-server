@@ -24,7 +24,7 @@ const Pattern = (props) => {
   };
 
   return (
-    <Card className="bg-black f-full w-full flex-1">
+    <Card sx={{ maxHeight: 90, maxWidth:180 }} className="f-full w-full ">
       <CardMedia
         component="img"
         image={props.data.imageUrl}
