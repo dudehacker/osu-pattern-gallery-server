@@ -53,13 +53,14 @@ const Upload = () => {
   return (
     <div>
       <Fab
-        variant="contained"
+        variant="extended"
         color="primary"
         onClick={handleOpen}
         style={style}
         aria-label="upload"
       >
         <AddIcon />
+        Upload
       </Fab>
       <Dialog onClose={handleOpen} open={open}>
         <DialogTitle>Submit New Pattern</DialogTitle>
