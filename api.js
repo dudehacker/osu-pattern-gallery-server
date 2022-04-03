@@ -255,10 +255,6 @@ router.postAsync("/pattern/search", async (req, res) => {
     sortAgg,
     { $project: { _id: -1 } },
   ]);
-  var patternQuery = {};
-  patternQuery.beatmap = {
-    $in: maps,
-  };
 
   const patterns = await Pattern.find({beatmap : {
     $in: maps,
