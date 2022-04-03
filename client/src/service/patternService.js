@@ -21,7 +21,8 @@ const getPatterns = (query) => {
     axios
       .post(routes.pattern+"/search", query.filters, {params: {
         page: query.page,
-        limit: query.limit
+        limit: query.limit,
+        text:query.text
       }})
       .then((res) => resolve(res.data))
       .catch((error) => {

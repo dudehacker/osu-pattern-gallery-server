@@ -11,7 +11,9 @@ const CustomSearch = () => {
 
   const handleFormSubmit = (event) => {
     // didn't add text search yet in Backend
-    console.log(patternSearch);
+    if (event.target.name==="text"){
+      patternSearch.text = event.target.value
+    }
     getPatterns(patternSearch).then((newPatterns) => {
       setPatterns(newPatterns);
     });
@@ -31,6 +33,7 @@ const CustomSearch = () => {
         <TextField
           onKeyPress={handleOnKeyPress}
           fullWidth
+          name="text"
           label="Search"
           InputProps={{
             endAdornment: (
