@@ -48,9 +48,4 @@ const BeatmapSchema = new mongoose.Schema({
     hasAudio: Boolean
 });
 
-BeatmapSchema.index({ title: 1, artist:1, creator: 1 , bpm: 1, genre:1, language:1, source:1, tags:1,
-    "difficulty.rating": 1, "counts.favourites": 1, "counts.plays": 1,
-    "objects.slider" : 1, "objects.normal": 1
-}); // sch
-
 module.exports = mongoose.model("Beatmap", BeatmapSchema);
