@@ -10,10 +10,10 @@ const CustomSearch = () => {
   const patternSearch = useStore((state) => state.patternSearch);
 
   const handleFormSubmit = (event) => {
-    // didn't add text search yet in Backend
     if (event.target.name==="text"){
       patternSearch.text = event.target.value
     }
+    patternSearch.page = 1;
     getPatterns(patternSearch).then((newPatterns) => {
       setPatterns(newPatterns);
     });

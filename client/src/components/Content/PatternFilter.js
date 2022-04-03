@@ -4,6 +4,7 @@ import PianoIcon from "@mui/icons-material/Piano";
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import MoodIcon from '@mui/icons-material/Mood';
 import StarIcon from '@mui/icons-material/Star';
+import { getPatterns } from "../../service/patternService";
 
 import {
   Checkbox,
@@ -13,12 +14,15 @@ import {
   Typography,
   Box,
   TextField,
+  Button,
   InputAdornment
 } from "@mui/material";
+import { P } from "pino";
 
 const PatternFilter = (props) => {
-  const { patternFilters, setPatternSearch } = useStore.getState();
+  const { patternFilters, setPatternSearch, setPatterns } = useStore.getState();
   const patternSearch = useStore((state) => state.patternSearch);
+  const patterns = useStore((state) => state.patterns);
 
   const handleChange = (event) => {
     const key = event.target.name;
@@ -42,6 +46,19 @@ const PatternFilter = (props) => {
     let value = Number(event.target.value);
     patternSearch.filters[key] = value;
     setPatternSearch(patternSearch);
+  }
+
+  const changePage = (event) => {
+    if (event.target.name === "next"){
+      patternSearch.page++;
+    } else if (patternSearch.page > 1) {
+      patternSearch.page--;
+    }
+
+    setPatternSearch(patternSearch);
+    getPatterns(patternSearch).then((newPatterns) => {
+      setPatterns(newPatterns);
+    });
   }
 
   const handleBpmChange = (event) => {
@@ -249,6 +266,19 @@ const PatternFilter = (props) => {
           </Grid>
         ))}
       </Grid>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs>
+          <Button name="previous" disabled={patternSearch.page===1} onClick={changePage}>Previous</Button>
+        </Grid>
+        <Grid item xs>
+          <Typography>Page: {patternSearch.page}</Typography>
+        </Grid>
+        <Grid item xs>
+          <Button name="next" disabled={patterns.length===0} onClick={changePage}>Next</Button>
+        </Grid>
+      </Grid>
+
+
     </FormGroup>
   );
 };
