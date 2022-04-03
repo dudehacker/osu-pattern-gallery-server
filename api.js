@@ -50,10 +50,10 @@ router.postAsync("/pattern", ensure.loggedIn, async (req, res) => {
     if (!savedMap){
         logger.info(`looking up new map: ${mapId}`)
         let newMap = await beatmapService.getMapData(mapId);
-
-        if (!beatmapService.isValidMap(newMap)){
+        let errorMsg = beatmapService.isValidMap(newMap)
+        if (errorMsg){
             logger.error(newMap);
-            return res.status(400).send(`invalid map for upload: ${mapId}`);
+            return res.status(400).send(errorMsg);
         }
         savedMap = await new Beatmap(newMap).save();
     } else {

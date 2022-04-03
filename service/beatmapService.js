@@ -46,19 +46,17 @@ const getMapIdFromLink = (mapUrl) => {
 
 const isValidMap = (mapData) =>{
     if (!mapData || !mapData.approvalStatus) {
-        logger.error("something wrong with beatmap data")
-        return false;
+        return "something wrong with beatmap data"
     }
     if (mapData.mode != "Mania"){
-        logger.error("map is not mania!")
-        return false;
+        return "map is not mania!"
+
     }
     const validStatus = [BeatmapStatus.RANKED, BeatmapStatus.LOVED].includes(mapData.approvalStatus)
     if (!validStatus){
-        logger.error("map must be ranked or loved!")
-        return false;
+        return "map must be ranked or loved!"
     }
-    return true;
+    return null;
 }
 
 const RankedStatus = BeatmapStatus

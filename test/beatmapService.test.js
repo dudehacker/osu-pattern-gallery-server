@@ -71,33 +71,33 @@ describe("get beatmap ID from map URL", () => {
 
 describe("check valid map for upload", () => {
   it("no param should be invalid", () => {
-    assert.equal(beatmapService.isValidMap(), false);
+    assert.isNotNull(beatmapService.isValidMap());
   });
   it("undefined should be invalid", () => {
-    assert.equal(beatmapService.isValidMap(undefined), false);
+    assert.isNotNull(beatmapService.isValidMap(undefined));
   });
   it("empty object should be invalid", () => {
-    assert.equal(beatmapService.isValidMap({}), false);
+    assert.isNotNull(beatmapService.isValidMap({}));
   });
   it("null approvalStatus should be invalid", () => {
-    assert.equal(beatmapService.isValidMap({ approvalStatus: null }), false);
+    assert.isNotNull(beatmapService.isValidMap({ approvalStatus: null }));
   });
   it("taiko map should be invalid", () => {
-    assert.equal(beatmapService.isValidMap({
+    assert.isNotNull(beatmapService.isValidMap({
       mode: "Taiko"
-    }), false);
+    }));
   });
-  it("ranked map should be true", () => {
+  it("ranked map should be valid", () => {
     assert.equal(
       beatmapService.isValidMap(rankedMap),
-      true,
+      null,
       JSON.stringify(rankedMap)
     );
   });
-  it("loved map should be true", () => {
+  it("loved map should be valid", () => {
     assert.equal(
       beatmapService.isValidMap(lovedMap),
-      true,
+      null,
       JSON.stringify(lovedMap)
     );
   });
