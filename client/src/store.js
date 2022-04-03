@@ -12,7 +12,7 @@ const initialPatternSearch = {
     bpm: [0, 500],
     sr: [0, 15]
   },
-  page: 0,
+  page: 1,
   limit: 25
 };
 
