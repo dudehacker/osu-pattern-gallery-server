@@ -7,11 +7,16 @@ import {
   Box,
   Avatar,
   Typography,
+  Tooltip
 } from "@mui/material";
 import { routes } from "../service/api";
 import Cookies from "js-cookie";
 
-import { LogoutIcon, LoginIcon } from "../components/Icons";
+import { LogoutIcon, LoginIcon , ContactSupportIcon } from "../components/Icons";
+
+const contactSupport = () =>{
+  window.open("https://osu.ppy.sh/users/748722", "_blank").focus();
+}
 
 const AppBar = () => {
   const { username, avatar } = useStore((state) => state.user);
@@ -32,14 +37,23 @@ const AppBar = () => {
           {username ? <Avatar alt="user-avatar" src={avatar}></Avatar> : <></>}
         </Box>
         <Box sx={{ display: "flex" }}>
-          <IconButton
+          <Tooltip title={username ? "Logout" : "Login"}>
+            <IconButton
             color="inherit"
             size="large"
             href={username ? routes.logout : routes.login}
             onClick={handleAccess}
           >
-            {username ? <LogoutIcon /> : <LoginIcon />}
-          </IconButton>
+              {username ? <LogoutIcon /> : <LoginIcon />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <Box>
+          <Tooltip title="Contact support">
+            <IconButton color="inherit" size="large" onClick={contactSupport}>
+              <ContactSupportIcon fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Toolbar>
     </MuiAppBar>
